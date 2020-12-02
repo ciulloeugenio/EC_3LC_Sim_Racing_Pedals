@@ -29,6 +29,10 @@ https://github.com/MHeironimus/ArduinoJoystickLibrary
 
 Lo sketch per il freno a mano è stato configurato per utilizzare un potenziometro collegato sugli estremi a GND e VCC e il pin centrale su A0
 
+Leggi lo sketch in modo da capire come fare la taratura
+
+Alla fine della taratura commentare le linee Serial
+
 */
 
 
@@ -45,18 +49,21 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_GAMEPAD,
 
 // Modificare i valori minpotenziometro e maxpotenziometro in base ai valori prelevati dal monitor seriale
 
-const long minpotenziometro = 0;
-const long maxpotenziometro = 1023;
-const long minjoybrake = -32768;
-const long maxjoybrake = 32768;
-const long handbrake = 0;
+long minpotenziometro = 0;
+long maxpotenziometro = 1023;
+long minjoybrake = 0;
+long maxjoybrake = 1023;
+
+//se hai collegato al contrario il potenziometro, inverti i valori mapmin e mapmax
+long mapmin = 0;      // inserire 1023
+long mapmax = 1023;	// inserire 0
+
 
 const bool initAutoSendState = true; 
 
 void setup() {
   Joystick.begin();
-  
-  Serial.begin(57600); delay(10);   //Commentare con doppie // per disabilitare il debug
+ // Serial.begin(57600); delay(10);   //Commentare con doppie // per disabilitare il debug
   
   Joystick.setBrakeRange(minjoybrake, maxjoybrake);
   pinMode(A0, INPUT_PULLUP);
@@ -64,13 +71,15 @@ void setup() {
 
 void loop() {
 
-	handbrake = analogRead(A0);
-	handbrake = map(handbrake,minpotenziometro,maxpotenziometro, minjoybrake, maxjoybrake);
+	long valpotenziometro = analogRead(A0);
+	long handbrake = map(valpotenziometro,minpotenziometro,maxpotenziometro, mapmin, mapmax);
 
-    Serial.print("Valore Potenziometro: \t");    //Commentare con doppie // per disabilitare il debug
-    Serial.print(handbrake);     //Commentare con doppie // per disabilitare il debug
+  //  Serial.print("Valore Potenziometro: \t");    //Commentare con doppie // per disabilitare il debug
+  //  Serial.print(valpotenziometro);     			//Commentare con doppie // per disabilitare il debug
+  //  Serial.print("\t\t Valore joy: \t");   		 //Commentare con doppie // per disabilitare il debug
+  //  Serial.println(handbrake);     				//Commentare con doppie // per disabilitare il debug
 
 	Joystick.setBrake(handbrake);
 
-  delay(5);
+  delay(5); (questo è un piccolo ritardo temporale, aumenta la stabilità del segnale)
 }
