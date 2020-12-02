@@ -33,6 +33,7 @@ Leggi lo sketch in modo da capire come fare la taratura
 
 Alla fine della taratura commentare le linee Serial
 
+n.b. per commentare una linea basta semplicemente inserie // all'inizio della riga
 */
 
 
@@ -81,5 +82,5 @@ void loop() {
 
 	Joystick.setBrake(handbrake);
 
-  delay(5); (questo è un piccolo ritardo temporale, aumenta la stabilità del segnale)
+  delay(5); // (questo è un piccolo ritardo temporale, aumenta la stabilità del segnale)
 }
