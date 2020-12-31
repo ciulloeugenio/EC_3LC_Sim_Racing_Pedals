@@ -118,8 +118,8 @@ void setup() {
   Joystick.setRyAxisRange(ZonainferioreFreno, ZonasuperioreFreno);
   Joystick.setRzAxisRange(ZonainferioreFrizione, ZonasuperioreFrizione);
  
-//decommentare il prossimo valore se si vuole aprire la seriale
-   Serial.begin(9600);
+//decommentare eliminando i // nel prossimo valore se si vuole aprire la monitor seriale
+ //  Serial.begin(9600);
     }
 const bool initAutoSendState = true;
 
@@ -133,13 +133,13 @@ void loop() {
   Joystick.setRzAxis(Frizione);
   
 // Decommentare le seriali eliminando /* e */ alla fine dei Serial.print
- 
+ /*
     Serial.print("Acceleratore : \t");
     Serial.print(Acceleratore);
     Serial.print("\t \t Freno: \t");
     Serial.print(Freno);
     Serial.print("\t Frizione : \t");
     Serial.println(Frizione);  
-
+*/
   delay(5);
 }
