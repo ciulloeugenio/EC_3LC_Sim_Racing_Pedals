@@ -66,76 +66,80 @@ Clock -> PIN7
 */
 
 #include "HX711.h"
-#include "Joystick.h"
+#include <Joystick.h>
 
-// HX711 circuit wiring
 const int LOADCELL_DOUT_PIN1 = 2;
 const int LOADCELL_SCK_PIN1 = 3;
 const int LOADCELL_DOUT_PIN2 = 4;
 const int LOADCELL_SCK_PIN2 = 5;
 const int LOADCELL_DOUT_PIN3 = 6;
 const int LOADCELL_SCK_PIN3 = 7;
-/*
-Abilitando il debug, nel monitor seriale verrà riprodotta la seguente stringa:
-HX711 reading1: "valore Acceleratore"  HX711 reading2: "valore Freno"  HX711 reading3:  "Valore Frizione"
-Premere i pedali, e impostare i valori qui di seguito per tarare il minimo e il massimo della corsa
-*/
-
-// Valori Costanti
-const long ACCMIN = -32767;
-const long ACCMAX = 32767;
-const long BRMIN = -32767;
-const long BRMAX = 32767;
-const long CLMIN = -32767;
-const long CLMAX = 32767;
-
-// Fattore di Calibrazione
-const long calibration_factor1 = 10;   //Sostituire questo valore di modo che il valore raw della cella sia nel range tra -32767 e 32767
-const long calibration_factor2 = 10;  //Sostituire questo valore di modo che il valore raw della cella sia nel range tra -32767 e 32767
-const long calibration_factor3 = 10; //Sostituire questo valore di modo che il valore raw della cella sia nel range tra -32767 e 32767
 
 
-// Dettaglio HID Joystick
+
+long Acceleratore = 0;
+long Freno = 0;
+long Frizione = 0;
+
+
+// Se volete calibrare il range degli assi, sostituire i seguenti valori
+const long ZonainferioreAcceleratore = -32767;
+const long ZonasuperioreAcceleratore = 32767;
+const long ZonainferioreFreno = -32767;
+const long ZonasuperioreFreno = 32767;
+const long ZonainferioreFrizione = -32767;
+const long ZonasuperioreFrizione = 32767;
+
+const long calibration_factor1 = 10;
+const long calibration_factor2 = 10;
+const long calibration_factor3 = 10;
+
 Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,JOYSTICK_TYPE_GAMEPAD,
-  0, 0,                  // Numero Punsanti, Numero Hat Switch
-  false, false, false,     // assi X, Y, e Z
-  true, true, true,   // assi Rx, Ry, e Rz
-  false, false,          // rudder e throttle
-  false, false, false);  // Acceleratpre, Freno, e Sterzo
-  
-const bool initAutoSendState = true; 
-
+  0, 0,                  // Button Count, Hat Switch Count
+  false, false, false,     // X and Y, but no Z Axis
+  true, true, true,   // No Rx, Ry, or Rz
+  false, false,          // No rudder or throttle
+  false, false, false);  // No accelerator, brake, or steering
 
 HX711 scale1;
 HX711 scale2;
 HX711 scale3;
 
+
 void setup() {
-  Serial.begin(9600); //Decommentare per aprire il debug
   scale1.begin(LOADCELL_DOUT_PIN1, LOADCELL_SCK_PIN1);
   scale2.begin(LOADCELL_DOUT_PIN2, LOADCELL_SCK_PIN2);
   scale3.begin(LOADCELL_DOUT_PIN3, LOADCELL_SCK_PIN3);
   scale1.set_scale(calibration_factor1);
   scale2.set_scale(calibration_factor2);
-  scale3.set_scale(calibration_factor3);
+  scale3.set_scale(calibration_factor3);  
   Joystick.begin();
-  Joystick.setRxAxisRange(ACCMIN,ACCMAX);
-  Joystick.setRyAxisRange(BRMIN,BRMAX);
-  Joystick.setRzAxisRange(CLMIN,CLMAX);
-}
+  Joystick.setRxAxisRange(ZonainferioreAcceleratore, ZonasuperioreAcceleratore);
+  Joystick.setRyAxisRange(ZonainferioreFreno, ZonasuperioreFreno);
+  Joystick.setRzAxisRange(ZonainferioreFrizione, ZonasuperioreFrizione);
+ 
+//decommentare il prossimo valore se si vuole aprire la seriale
+   Serial.begin(9600);
+    }
+const bool initAutoSendState = true;
+
 
 void loop() {
-    long reading1 = scale1.get_units();
-    Serial.print("Acceleratore: \t");    //Decommentare per aprire il debug
-    Serial.print(reading1);     //Decommentare per aprire il debug
-    Joystick.setRxAxis(reading1);
-    long reading2 = scale2.get_units();
-    Serial.print("\t\t Freno: \t");    //Decommentare per aprire il debug
-     Serial.print(reading2);      //Decommentare per aprire il debug
-    Joystick.setRyAxis(reading2);
-    long reading3 = scale3.get_units();
-    Serial.print("\t\t Frizione: \t");      //Decommentare per aprire il debug
-    Serial.println(reading3);     //Decommentare per aprire il debug
-    Joystick.setRzAxis(reading3);
-    delay(5);
+  Acceleratore = scale1.get_units();
+  Freno = scale2.get_units();
+  Frizione = scale3.get_units();
+  Joystick.setRxAxis(Acceleratore);
+  Joystick.setRyAxis(Freno);
+  Joystick.setRzAxis(Frizione);
+  
+// Decommentare le seriali eliminando /* e */ alla fine dei Serial.print
+ 
+    Serial.print("Acceleratore : \t");
+    Serial.print(Acceleratore);
+    Serial.print("\t \t Freno: \t");
+    Serial.print(Freno);
+    Serial.print("\t Frizione : \t");
+    Serial.println(Frizione);  
+
+  delay(5);
 }
